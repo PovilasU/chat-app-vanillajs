@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #chat-box {
+        width: 300px;
+        height: 300px;
+        border: 1px solid #000;
+        overflow-y: scroll;
+        margin: auto;
+      }
+      #message {
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Simple Chat</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="message" placeholder="Type a message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <!-- <script type="module" src="/main.js"></script> -->
+
+    <script>
+      const chatBox = document.getElementById("chat-box");
+      const messageInput = document.getElementById("message");
+
+      const ws = new WebSocket("ws://localhost:8081");
+
+      ws.onmessage = (event) => {
+        const message = document.createElement("p");
+        const reader = new FileReader();
+        reader.onload = () => {
+          message.textContent = reader.result;
+          chatBox.appendChild(message);
+          chatBox.scrollTop = chatBox.scrollHeight;
+        };
+        reader.readAsText(event.data);
+      };
+
+      function sendMessage() {
+        if (messageInput.value.trim() !== "") {
+          ws.send(messageInput.value);
+          messageInput.value = "";
+        }
+      }
+    </script>
+  </body>
+</html>
